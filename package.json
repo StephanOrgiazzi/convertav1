@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "private": true,
     "type": "module",
-    "description": "CLI to convert a video to AV1 at ~50% of original size using ffmpeg/ffprobe (NVENC or libaom)",
+    "description": "CLI to convert a video to AV1 at ~50% of original size using ffmpeg/ffprobe (NVENC or libsvtav1)",
     "author": "Stephan Orgiazzi",
     "scripts": {
         "start": "bun run src/convert_av1.ts",

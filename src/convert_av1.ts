@@ -325,8 +325,8 @@ async function main() {
 
         // Choose encoder
         const usingNvenc = await detectNvenc();
-        let videoEncoder = "libaom-av1";
-        let videoEncoderOptions = "-crf 30 -b:v 0 -cpu-used 4 -row-mt 1";
+        let videoEncoder = "libsvtav1";
+        let videoEncoderOptions = "-crf 30 -b:v 0 -preset 8 -tune 0";
         if (usingNvenc) {
             process.stdout.write("GPU detected. Using NVIDIA NVENC (av1_nvenc)." + EOL);
             videoEncoder = "av1_nvenc";
@@ -339,7 +339,7 @@ async function main() {
             if (usingNvenc) {
                 videoEncoderOptions = `-rc vbr -b:v:0 ${b} -maxrate:v:0 ${max} -bufsize:v:0 ${buf} -preset p6 -tune hq -spatial-aq 1 -aq-strength 8`;
             } else {
-                videoEncoderOptions = `-b:v:0 ${b} -maxrate:v:0 ${max} -bufsize:v:0 ${buf} -cpu-used 5 -row-mt 1`;
+                videoEncoderOptions = `-b:v:0 ${b} -maxrate:v:0 ${max} -bufsize:v:0 ${buf} -preset 8 -tune 0`;
             }
         }
 
