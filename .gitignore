@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+bun.lockb
+
+# Build outputs
+*.exe
+*.app/
+convert-av1-*
+Convert AV1.app/
+Convert AV1.lnk
+
+# Generated assets
+assets/*.ico
+assets/*.icns
+assets/*.png
+
+
+# OS generated files
+.DS_Store
+Thumbs.db

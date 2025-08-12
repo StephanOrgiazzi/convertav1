@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
+  <title id="title">Convert AV1</title>
+  <desc id="desc">Rounded gradient square with a play symbol and AV1 badge, representing an AV1 video converter</desc>
+
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e3a8a"/>
+      <stop offset="100%" stop-color="#6d28d9"/>
+    </linearGradient>
+
+    <radialGradient id="highlight" cx="35%" cy="25%" r="70%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.24"/>
+      <stop offset="60%" stop-color="#ffffff" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#0b1020" flood-opacity="0.35"/>
+    </filter>
+
+    <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#22d3ee"/>
+      <stop offset="100%" stop-color="#a3e635"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background card -->
+  <rect x="64" y="64" width="896" height="896" rx="196" fill="url(#bg)"/>
+  <rect x="64" y="64" width="896" height="896" rx="196" fill="url(#highlight)"/>
+
+  <!-- Conversion ring (two arcs with subtle gap) -->
+  <g transform="translate(0,0)">
+    <path d="M512 228a284 284 0 0 1 246.9 139" fill="none" stroke="url(#ringGrad)" stroke-width="22" stroke-linecap="round" opacity="0.85"/>
+    <path d="M758.9 367l23-52 52 23" fill="none" stroke="#a3e635" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+
+    <path d="M512 796A284 284 0 0 1 265.1 657" fill="none" stroke="url(#ringGrad)" stroke-width="22" stroke-linecap="round" opacity="0.75"/>
+    <path d="M265.1 657l-23 52-52-23" fill="none" stroke="#22d3ee" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+  </g>
+
+  <!-- Play triangle -->
+  <g filter="url(#softShadow)">
+    <path d="M448 350l256 162-256 162z" fill="#ffffff" opacity="0.98"/>
+  </g>
+
+  <!-- AV1 badge -->
+  <g transform="translate(0,0)">
+    <rect x="680" y="720" width="248" height="128" rx="28" fill="#0b1020" opacity="0.55"/>
+    <rect x="680" y="720" width="248" height="128" rx="28" fill="none" stroke="#ffffff" stroke-opacity="0.85" stroke-width="2"/>
+    <g font-family="Inter, Segoe UI, Roboto, Arial, sans-serif" font-weight="700" font-size="72" fill="#ffffff">
+      <text x="708" y="803" letter-spacing="0.02em">AV1</text>
+    </g>
+  </g>
+
+  <!-- Subtle glossy top edge -->
+  <path d="M128 240c0-44.2 35.8-80 80-80h608c44.2 0 80 35.8 80 80v18c-248 62-520 62-768 0z" fill="#ffffff" opacity="0.06"/>
+</svg>
