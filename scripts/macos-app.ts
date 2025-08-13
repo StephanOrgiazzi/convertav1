@@ -3,9 +3,23 @@
 
 import fs from "node:fs/promises";
 import path from "node:path";
+import { spawn } from "node:child_process";
+import { promisify } from "node:util";
+
+const execAsync = promisify(spawn);
 
 async function ensureDir(dir: string) {
     await fs.mkdir(dir, { recursive: true });
+}
+
+async function setExecutablePermissions(filePath: string) {
+    try {
+        // Set executable permissions (755)
+        await fs.chmod(filePath, 0o755);
+        console.log(`Set executable permissions for ${filePath}`);
+    } catch (error) {
+        console.warn(`Warning: Could not set permissions for ${filePath}:`, error.message);
+    }
 }
 
 async function writePlist(appName: string, bundleId: string, execName: string): Promise<string> {
@@ -53,9 +67,15 @@ async function main() {
     await ensureDir(resources);
 
     // Copy binary
-    await fs.copyFile(binAbs, path.join(macos, execName));
+    const binaryPath = path.join(macos, execName);
+    await fs.copyFile(binAbs, binaryPath);
+    
+    // Set executable permissions
+    await setExecutablePermissions(binaryPath);
+    
     // Copy icns
     await fs.copyFile(path.resolve(icnsPath), path.join(resources, "icon.icns"));
+    
     // Write Info.plist
     const plist = await writePlist(appName, bundleId, execName);
     await fs.writeFile(plistPath, plist);

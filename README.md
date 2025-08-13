@@ -8,11 +8,6 @@ Easy to use! Just drag and drop your file in the app and press Enter!
 
 ![convert-av1 in action](assets/screen.jpg)
 
-## Requirements
-
-- Bun installed
-- ffmpeg/ffprobe are bundled automatically via ffmpeg-static and ffprobe-static; no system install required.
-
 ## Download
 
 **[📥 Download Latest Release](https://github.com/StephanOrgiazzi/convertav1/releases/latest)**
@@ -21,7 +16,7 @@ Pre-built executables are available for Windows, macOS, and Linux. No installati
 
 ## How It Works
 
-The script performs intelligent video conversion with the following workflow:
+The application is built on top of **ffmpeg**, the industry-standard multimedia framework. ffmpeg and ffprobe are **bundled directly into the executable** - no separate installation required! The app performs intelligent video conversion with the following workflow:
 
 ### 1. **Input Analysis & Validation**
 
@@ -59,6 +54,10 @@ The script performs intelligent video conversion with the following workflow:
 - Uses `-movflags +faststart` for web-optimized streaming
 - Real-time progress tracking with ETA calculation
 - Outputs to `{filename}_av1.mp4` in the same directory
+
+## Dev Requirements
+
+- Bun installed
 
 ## Dev Usage
 
