@@ -1,43 +1,45 @@
 {
-    "name": "convertav1",
-    "version": "1.0.0",
-    "private": true,
-    "type": "module",
-    "description": "CLI to convert a video to AV1 at ~50% of original size using ffmpeg/ffprobe (NVENC or libsvtav1)",
-    "author": "Stephan Orgiazzi",
-    "scripts": {
-        "start": "bun run src/convert_av1.ts",
-        "build:win": "bun build --compile --target=bun-windows-x64 src/convert_av1.ts --outfile convert-av1-win.exe",
-        "build:mac-x64": "bun build --compile --target=bun-darwin-x64 src/convert_av1.ts --outfile convert-av1-macos-x64",
-        "build:mac-arm64": "bun build --compile --target=bun-darwin-arm64 src/convert_av1.ts --outfile convert-av1-macos-arm64",
-        "build:linux-x64": "bun build --compile --target=bun-linux-x64 src/convert_av1.ts --outfile convert-av1-linux-x64",
-        "build:linux-arm64": "bun build --compile --target=bun-linux-arm64 src/convert_av1.ts --outfile convert-av1-linux-arm64",
-        "icon:from-svg": "bun scripts/svg-to-ico.ts assets/icon.svg assets/icon.ico",
-        "icon:win": "bun scripts/set-win-icon.ts convert-av1-win.exe assets/icon.ico",
-        "shortcut:win": "bun scripts/create-win-shortcut.ts convert-av1-win.exe assets/icon.ico 'Convert AV1.lnk'",
-        "bundle:win": "bun run icon:from-svg && bun run build:win && bun run shortcut:win",
-        "icns:from-svg": "bun scripts/svg-to-icns.ts assets/icon.svg assets/icon.icns",
-        "png:from-svg": "bun scripts/svg-to-png.ts assets/icon.svg assets/icon.png 256",
-        "bundle:mac-x64": "bun run icns:from-svg && bun run build:mac-x64 && bun scripts/macos-app.ts convert-av1-macos-x64 'Convert AV1' assets/icon.icns com.convertav1.app",
-        "bundle:mac-arm64": "bun run icns:from-svg && bun run build:mac-arm64 && bun scripts/macos-app.ts convert-av1-macos-arm64 'Convert AV1' assets/icon.icns com.convertav1.app",
-        "bundle:linux-x64": "bun run png:from-svg && bun run build:linux-x64 && bun scripts/linux-app.ts convert-av1-linux-x64 'Convert AV1' assets/icon.png convert-av1-linux-x64-app",
-        "bundle:linux-arm64": "bun run png:from-svg && bun run build:linux-arm64 && bun scripts/linux-app.ts convert-av1-linux-arm64 'Convert AV1' assets/icon.png convert-av1-linux-arm64-app",
-        "bundle:all": "bun run bundle:win && bun run bundle:mac-x64 && bun run bundle:mac-arm64 && bun run bundle:linux-x64 && bun run bundle:linux-arm64"
-    },
-    "packageManager": "bun@1.1.0",
-    "engines": {
-        "node": ">=18",
-        "bun": ">=1.1.0"
-    },
-    "dependencies": {
-        "@types/cli-progress": "^3.11.6",
-        "chalk": "^5.5.0",
-        "cli-progress": "^3.12.0",
-        "ffmpeg-static": "^5.2.0",
-        "ffprobe-static": "^3.1.0",
-        "png2icons": "^2.0.1",
-        "rcedit": "^3.0.1",
-        "sharp": "^0.33.4",
-        "to-ico": "^1.1.5"
-    }
+  "name": "convertav1",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "CLI to convert a video to AV1 at ~50% of original size using ffmpeg/ffprobe (NVENC or libsvtav1)",
+  "author": "Stephan Orgiazzi",
+  "scripts": {
+    "start": "bun run src/convert_av1.ts",
+    "build:win": "bun build --compile --target=bun-windows-x64 src/convert_av1.ts --outfile convert-av1-win.exe",
+    "build:mac-x64": "bun build --compile --target=bun-darwin-x64 src/convert_av1.ts --outfile convert-av1-macos-x64",
+    "build:mac-arm64": "bun build --compile --target=bun-darwin-arm64 src/convert_av1.ts --outfile convert-av1-macos-arm64",
+    "build:linux-x64": "bun build --compile --target=bun-linux-x64 src/convert_av1.ts --outfile convert-av1-linux-x64",
+    "build:linux-arm64": "bun build --compile --target=bun-linux-arm64 src/convert_av1.ts --outfile convert-av1-linux-arm64",
+    "icon:from-svg": "bun scripts/svg-to-ico.ts assets/icon.svg assets/icon.ico",
+    "icon:win": "bun scripts/set-win-icon.ts convert-av1-win.exe assets/icon.ico",
+    "shortcut:win": "bun scripts/create-win-shortcut.ts convert-av1-win.exe assets/icon.ico 'Convert AV1.lnk'",
+    "bundle:win": "bun run icon:from-svg && bun run build:win && bun run shortcut:win",
+    "icns:from-svg": "bun scripts/svg-to-icns.ts assets/icon.svg assets/icon.icns",
+    "png:from-svg": "bun scripts/svg-to-png.ts assets/icon.svg assets/icon.png 256",
+    "bundle:mac-x64": "bun run icns:from-svg && bun run build:mac-x64 && bun scripts/macos-app.ts convert-av1-macos-x64 'Convert AV1' assets/icon.icns com.convertav1.app",
+    "bundle:mac-arm64": "bun run icns:from-svg && bun run build:mac-arm64 && bun scripts/macos-app.ts convert-av1-macos-arm64 'Convert AV1' assets/icon.icns com.convertav1.app",
+    "bundle:linux-x64": "bun run png:from-svg && bun run build:linux-x64 && bun scripts/linux-app.ts convert-av1-linux-x64 'Convert AV1' assets/icon.png convert-av1-linux-x64-app",
+    "bundle:linux-arm64": "bun run png:from-svg && bun run build:linux-arm64 && bun scripts/linux-app.ts convert-av1-linux-arm64 'Convert AV1' assets/icon.png convert-av1-linux-arm64-app",
+    "bundle:all": "bun run bundle:win && bun run bundle:mac-x64 && bun run bundle:mac-arm64 && bun run bundle:linux-x64 && bun run bundle:linux-arm64"
+  },
+  "packageManager": "bun@1.1.0",
+  "engines": {
+    "node": ">=18",
+    "bun": ">=1.1.0"
+  },
+  "dependencies": {
+    "@types/cli-progress": "^3.11.6",
+    "chalk": "^5.5.0",
+    "cli-progress": "^3.12.0",
+    "ffmpeg-ffprobe-static": "^6.1.2-rc.1",
+    "png2icons": "^2.0.1",
+    "rcedit": "^3.0.1",
+    "sharp": "^0.33.4",
+    "to-ico": "^1.1.5"
+  },
+  "trustedDependencies": [
+    "ffmpeg-ffprobe-static"
+  ]
 }

@@ -1,10 +1,8 @@
 ## convert-av1 (Bun/TypeScript CLI)
 
-Converts a video to AV1 with maximum visual fidelity while achieving roughly 50% of its original file size. Preserves audio, subtitles, and the embedded thumbnail if present, falling back to generating a thumbnail if missing. Uses NVIDIA NVENC AV1 when available (RTX 40-series), otherwise libaom-av1 with quality-optimized settings.
+Converts a video to AV1 with maximum visual fidelity while achieving roughly 50% of its original file size. Preserves audio, subtitles, and generates a thumbnail from the video. Uses NVIDIA NVENC AV1 when available (RTX 40-series), otherwise libsvtav1 with quality-optimized settings.
 
 Easy to use! Just drag and drop your file in the app and press Enter!
-
-## Screenshot
 
 ![convert-av1 in action](assets/screen.jpg)
 
@@ -26,8 +24,7 @@ The application is built on top of **ffmpeg**, the industry-standard multimedia 
 
 ### 2. **Thumbnail Processing**
 
-- **Priority 1**: Extracts existing embedded thumbnail (attached_pic stream) if present
-- **Priority 2**: Generates new thumbnail from video frame at 1 second mark if none exists
+- Generates thumbnail from video frame at 1 second mark
 - Thumbnails are temporarily stored and cleaned up after conversion
 
 ### 3. **Smart Bitrate Calculation**
@@ -43,9 +40,9 @@ The application is built on top of **ffmpeg**, the industry-standard multimedia 
   - Hardware acceleration for RTX 40-series GPUs
   - Optimized for speed and quality
   - Uses VBR (Variable Bitrate) with CQ 28, preset P6, HQ tuning
-- **libaom-av1** (fallback):
+- **libsvtav1** (fallback):
   - CPU-based encoding with quality-focused settings
-  - CRF 30, CPU optimization level 4, row-multithreading enabled
+  - CRF 30, preset 8, tune 0
 
 ### 5. **Conversion Process**
 
