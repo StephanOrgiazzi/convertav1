@@ -6,6 +6,9 @@ import { readFile, rm, stat, writeFile, chmod } from "fs/promises";
 import { createInterface } from "readline";
 import { EOL } from "os";
 import path from "path";
+import { randomUUID } from "crypto";
+import chalk from "chalk";
+import cliProgress from "cli-progress";
 
 type RunResult = { code: number | null; stdout: string; stderr: string };
 
@@ -51,18 +54,21 @@ function formatTimeHMS(totalSeconds: number): string {
 }
 
 async function promptForPath(): Promise<string> {
-    process.stdout.write("Please drag and drop your video file here and press Enter:" + EOL);
+    console.log(chalk.cyan("\n🎬 ConvertAV1 - Video Converter"));
+    console.log(chalk.gray("═".repeat(40)));
+    console.log(chalk.yellow("📁 Please drag and drop your video file here and press Enter:"));
+    process.stdout.write(chalk.green("➤ "));
     const rl = createInterface({ input: process.stdin, output: process.stdout });
     const answer: string = await new Promise((resolve) => rl.question("", resolve));
     rl.close();
-    return answer.trim().replace(/^\"|\"$/g, "");
+    return answer.trim().replace(/^\"|\"|$/g, "");
 }
 
 async function ensureFileExists(filePath: string): Promise<void> {
     try {
         await stat(filePath);
     } catch {
-        throw new Error(`Error: File not found at '${filePath}'`);
+        throw new Error(chalk.red(`❌ Error: File not found at '${filePath}'`));
     }
 }
 
@@ -167,8 +173,23 @@ async function encodeWithProgress(args: string[], totalDurationSeconds: number):
     return new Promise((resolve, reject) => {
         const child = spawn(ffmpegSpawnPathCached, args, { stdio: ["ignore", "pipe", "pipe"] });
 
+        let progressBar: any = null;
         let lastPercent = -1;
         let start = Date.now();
+
+        // Create progress bar if we have duration info
+        if (totalDurationSeconds > 0) {
+            progressBar = new cliProgress.SingleBar({
+                format: chalk.cyan('🔄 Converting') + ' |' + chalk.green('{bar}') + '| {percentage}% | ETA: {eta}s | Speed: {speed}x',
+                barCompleteChar: '█',
+                barIncompleteChar: '░',
+                hideCursor: true
+            });
+            progressBar.start(100, 0, {
+                speed: "0.0",
+                eta: "calculating..."
+            });
+        }
 
         const onProgressLine = (line: string) => {
             // When using -progress pipe:1, look for out_time_ms= and progress=
@@ -181,10 +202,19 @@ async function encodeWithProgress(args: string[], totalDurationSeconds: number):
                     if (percent - lastPercent >= 0.5 || percent === 100) {
                         lastPercent = percent;
                         const elapsedSec = (Date.now() - start) / 1000;
+                        const speed = seconds / elapsedSec;
                         const remainingPercent = Math.max(0.001, 100 - percent);
                         const etaSec = elapsedSec * (remainingPercent / Math.max(0.001, percent));
-                        const status = `${percent.toFixed(2)}% complete - ETA: ${formatTimeHMS(etaSec)}`;
-                        process.stdout.write(`\r${status.padEnd(60, " ")}`);
+                        
+                        if (progressBar) {
+                            progressBar.update(percent, {
+                                speed: speed.toFixed(1),
+                                eta: Math.round(etaSec)
+                            });
+                        } else {
+                            const status = `${percent.toFixed(2)}% complete - ETA: ${formatTimeHMS(etaSec)}`;
+                            process.stdout.write(`\r${status.padEnd(60, " ")}`);
+                        }
                     }
                 }
             }
@@ -206,7 +236,11 @@ async function encodeWithProgress(args: string[], totalDurationSeconds: number):
         child.stderr.on("data", (d) => handleChunk(d as Buffer, false));
 
         child.on("close", (code) => {
-            process.stdout.write("\n");
+            if (progressBar) {
+                progressBar.stop();
+            } else {
+                process.stdout.write("\n");
+            }
             if (code === 0) return resolve(0);
             const stderr = stderrBuf.join("");
             const stdout = stdoutBuf.join("");
@@ -274,16 +308,16 @@ async function main() {
         const dir = path.dirname(inputPath);
         const fileNameNoExt = path.parse(inputPath).name;
         const outputPath = path.join(dir, `${fileNameNoExt}_av1.mp4`);
-        const tempThumb = path.join(process.env.TEMP || dir, `video_thumbnail_${crypto.randomUUID()}.jpg`);
+        const tempThumb = path.join(process.env.TEMP || dir, `video_thumbnail_${randomUUID()}.jpg`);
 
-        process.stdout.write("Probing video file..." + EOL);
+        console.log(chalk.blue("\n🔍 Probing video file..."));
         const probeText = await probeWithFfmpeg(inputPath);
 
         let totalDurationSeconds = parseDurationSeconds(probeText);
         if (totalDurationSeconds > 0) {
-            process.stdout.write(`Video duration found: ${formatTimeHMS(totalDurationSeconds)}` + EOL);
+            console.log(chalk.green(`⏱️  Video duration found: ${chalk.bold(formatTimeHMS(totalDurationSeconds))}`));
         } else {
-            process.stdout.write("Warning: Could not determine video duration. ETA will not be available." + EOL);
+            console.log(chalk.yellow("⚠️  Warning: Could not determine video duration. ETA will not be available."));
         }
 
         // Extract or generate thumbnail
@@ -314,13 +348,14 @@ async function main() {
         }
 
         if (origTotalBitrateKbps > 0) {
-            process.stdout.write(EOL);
-            process.stdout.write(`Original size: ${(inputSizeBytes / (1024 * 1024)).toFixed(2)} MB` + EOL);
-            process.stdout.write(`Estimated total bitrate: ${origTotalBitrateKbps} kbps` + EOL);
-            process.stdout.write(`Estimated audio bitrate: ${audioTotalBitrateKbps} kbps (${audioStreamCount} stream(s))` + EOL);
-            process.stdout.write(`Target video bitrate (~50% total size): ${targetVideoBitrateKbps} kbps` + EOL);
+            console.log(chalk.cyan("\n📊 File Analysis:"));
+            console.log(chalk.gray("─".repeat(30)));
+            console.log(`📁 Original size: ${chalk.bold.white((inputSizeBytes / (1024 * 1024)).toFixed(2))} ${chalk.gray('MB')}`);
+            console.log(`📈 Total bitrate: ${chalk.bold.cyan(origTotalBitrateKbps)} ${chalk.gray('kbps')}`);
+            console.log(`🔊 Audio bitrate: ${chalk.bold.magenta(audioTotalBitrateKbps)} ${chalk.gray(`kbps (${audioStreamCount} stream(s))`)}`);
+            console.log(`🎯 Target video bitrate: ${chalk.bold.green(targetVideoBitrateKbps)} ${chalk.gray('kbps (~50% size)')}`);
         } else {
-            process.stdout.write("Could not compute original bitrate; will use quality-based defaults." + EOL);
+            console.log(chalk.yellow("⚠️  Could not compute original bitrate; will use quality-based defaults."));
         }
 
         // Choose encoder
@@ -328,9 +363,11 @@ async function main() {
         let videoEncoder = "libsvtav1";
         let videoEncoderOptions = "-crf 30 -b:v 0 -preset 8 -tune 0";
         if (usingNvenc) {
-            process.stdout.write("GPU detected. Using NVIDIA NVENC (av1_nvenc)." + EOL);
+            console.log(chalk.green("\n🚀 GPU detected! Using NVIDIA NVENC (av1_nvenc)"));
             videoEncoder = "av1_nvenc";
             videoEncoderOptions = "-rc vbr -cq 28 -b:v 0 -preset p6 -tune hq -spatial-aq 1 -aq-strength 8";
+        } else {
+            console.log(chalk.blue("\n💻 Using CPU encoder (libsvtav1)"));
         }
         if (targetVideoBitrateKbps > 0) {
             const b = `${targetVideoBitrateKbps}k`;
@@ -364,19 +401,27 @@ async function main() {
             outputPath,
         ];
 
-        process.stdout.write(EOL + "Starting AV1 conversion targeting ~50% size... 🚀" + EOL);
+        console.log(chalk.cyan("\n🎬 Starting AV1 conversion targeting ~50% size..."));
+        console.log(chalk.gray("═".repeat(50)));
         const start = Date.now();
         try {
             await encodeWithProgress(ffArgs, totalDurationSeconds);
-            process.stdout.write("\n✅ Conversion finished!" + EOL);
-            process.stdout.write(`Output file: ${outputPath}` + EOL);
+            const elapsed = ((Date.now() - start) / 1000 / 60).toFixed(1);
+            console.log(chalk.green("\n✅ Conversion completed successfully!"));
+            console.log(chalk.gray("─".repeat(40)));
+            console.log(`📁 Output file: ${chalk.bold.white(path.basename(outputPath))}`);
+            console.log(`📍 Location: ${chalk.gray(path.dirname(outputPath))}`);
+            console.log(`⏱️  Time taken: ${chalk.bold.cyan(elapsed)} minutes`);
             try {
                 const outStat = await stat(outputPath);
-                process.stdout.write(`Output size: ${(outStat.size / (1024 * 1024)).toFixed(2)} MB` + EOL);
+                const outputSizeMB = (outStat.size / (1024 * 1024)).toFixed(2);
+                const compressionRatio = ((1 - outStat.size / inputSizeBytes) * 100).toFixed(1);
+                console.log(`📊 Output size: ${chalk.bold.green(outputSizeMB)} MB`);
+                console.log(`🗜️  Compression: ${chalk.bold.magenta(compressionRatio)}% smaller`);
             } catch { }
         } catch (err: any) {
-            process.stderr.write("\n❌ An error occurred during conversion." + EOL);
-            process.stderr.write((err?.message ?? String(err)) + EOL);
+            console.error(chalk.red("\n❌ Conversion failed!"));
+            console.error(chalk.red(err?.message ?? String(err)));
             process.exitCode = 1;
         } finally {
             // cleanup
